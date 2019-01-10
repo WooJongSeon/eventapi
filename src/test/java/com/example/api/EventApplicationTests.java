@@ -1,4 +1,4 @@
-package com.example.event;
+package com.example.api;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +11,7 @@ public class EventApplicationTests {
 
     @Test
     public void contextLoads() {
-    }
 
+    }
 }
 
