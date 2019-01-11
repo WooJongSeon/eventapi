@@ -2,6 +2,7 @@ package com.example.api.events;
 
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 //@Data data 애너테이션을 사용하는 것은 권하지 않는다.
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
 @Builder @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter @EqualsAndHashCode(of = "id") // 애너테이션이 굉장히 많은데. 원래 Lombok 의 애너테이션을 제외한 다른 애너테이션들은 메타 애너테이션을 활용해서 줄일 수 있다.
 //롬복의 애너테이션들은 아직 줄일 수 있는 방법이 없다. 이렇게 다 작성해야 한다.
+@Entity
 public class Event {
+    @Id @GeneratedValue
     private Integer id;
     private String name;
     private String description;
@@ -24,6 +27,8 @@ public class Event {
     private int limitOfEnrollment;
     private boolean offline;
     private boolean free;
-    private EventStatus eventStatus;
+    @Enumerated(EnumType.STRING) // 기본 타입은 EnumType.Ordinal 인데 String 으로 바꿔주는 것이 좋다.
+    private EventStatus eventStatus; // Enum 클래스 안의 데이터의 순서가 바뀌게 되면 데이터에 문제가 생긴다.
+    //그래서 순서가 바뀌어도 문제 되지 않는 String 을 사용한다.
 
 }
