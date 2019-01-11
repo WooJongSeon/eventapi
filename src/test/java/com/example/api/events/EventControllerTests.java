@@ -8,17 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest//web 과 관련된 것만 만들기 때문에 슬라이싱 테스트라고 부른다. 테스트용 빈을 모두 만드는 것이 아니라 웹과 관련된 것만 만든다. 그래서 더 빠르다.
@@ -51,12 +51,15 @@ public class EventControllerTests {
                             .build();
         event.setId(10);
         Mockito.when(eventRepository.save(event)).thenReturn(event);
-        mockMvc.perform(post("/api/events/")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event))) // HAL = Hypertext Application Language
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists());
+        mockMvc.perform(post("/api/events/") //perform 안에는 요청 uri 를 적는다.
+                    .contentType(MediaType.APPLICATION_JSON_UTF8) //요청 content type
+                    .accept(MediaTypes.HAL_JSON) //응답 Media 타입
+                    .content(objectMapper.writeValueAsString(event))) // HAL = Hypertext Application Language , 응답 내용을 ObjectMapper 로 작성한다.(JSON)
+                .andDo(print()) // 요청 정보를 모두 출력한다.
+                .andExpect(status().isCreated()) // 응답이 어떤지 확인한다. - andExpect()
+                .andExpect(jsonPath("id").exists())
+                .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.LOCATION))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE));
+
     }
 }
