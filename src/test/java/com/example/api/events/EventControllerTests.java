@@ -1,11 +1,14 @@
 package com.example.api.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest//web 과 관련된 것만 만들기 때문에 슬라이싱 테스트라고 부른다. 테스트용 빈을 모두 만드는 것이 아니라 웹과 관련된 것만 만든다. 그래서 더 빠르다.
+//@WebMvcTest//web 과 관련된 것만 만들기 때문에 슬라이싱 테스트라고 부른다. 테스트용 빈을 모두 만드는 것이 아니라 웹과 관련된 것만 만든다. 그래서 더 빠르다.
 //WebMvc - 슬라이싱 테스트용 애너테이션
+@SpringBootTest // 웹에 관련된 테스트는 주로 SpringBootTest 로 작성한다. 이것을 슬라이싱 테스트로 안하는 이유는 Mock 로 만들어줘야 하는 항목이 너무 많아지기 때문이다.
+//이렇게 SpringBootTest 애너테이션을 붙이면 메인 클래스의 @SpringBootApplication 애너테이션을 찾는다.
+//그렇게 찾은 후에는 모든 @Bean을 등록해준다. 그럼 테스트 코드에서 @Autowired 나 객체 사용시 문제가 없게 된다.
+@AutoConfigureMockMvc
 public class EventControllerTests {
 
     @Autowired
@@ -32,8 +39,8 @@ public class EventControllerTests {
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    EventRepository eventRepository;
+//    @MockBean
+//    EventRepository eventRepository;
 
     @Test
     public void createEvent() throws Exception {
@@ -48,9 +55,13 @@ public class EventControllerTests {
                             .maxPrice(200)
                             .limitOfEnrollment(100)
                             .location("강남역 D2 스타텁 팩토리")
+                            .free(true)
+                            .offline(false)
+                            .eventStatus(EventStatus.PUBLISHED)
                             .build();
-        event.setId(10);
-        Mockito.when(eventRepository.save(event)).thenReturn(event);
+
+//        event.setId(10);
+//        Mockito.when(eventRepository.save(event)).thenReturn(event);
         mockMvc.perform(post("/api/events/") //perform 안에는 요청 uri 를 적는다.
                     .contentType(MediaType.APPLICATION_JSON_UTF8) //요청 content type
                     .accept(MediaTypes.HAL_JSON) //응답 Media 타입
@@ -59,7 +70,9 @@ public class EventControllerTests {
                 .andExpect(status().isCreated()) // 응답이 어떤지 확인한다. - andExpect()
                 .andExpect(jsonPath("id").exists())
                 .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.LOCATION))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE));
-
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("id").value(Matchers.not(100)))
+                .andExpect(jsonPath("free").value(Matchers.not(true)))
+                .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT.name())));
     }
 }

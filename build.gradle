@@ -26,6 +26,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.1'
+
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'
