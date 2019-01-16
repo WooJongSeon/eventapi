@@ -4,12 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -74,5 +71,33 @@ public class EventControllerTests {
                 .andExpect(jsonPath("id").value(Matchers.not(100)))
                 .andExpect(jsonPath("free").value(Matchers.not(true)))
                 .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT.name())));
+    }
+    @Test
+    public void createEvent_Bad_Request() throws Exception {
+        Event event = Event.builder()
+                .id(100)
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018,11,1,10,0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018,11,5,10,0))
+                .beginEventDateTime(LocalDateTime.of(2018,11,25,10,0))
+                .endEventDateTime(LocalDateTime.of(2018,11,26,10,0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("로케이션")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+//        event.setId(10);
+//        Mockito.when(eventRepository.save(event)).thenReturn(event);
+        mockMvc.perform(post("/api/events/") //perform 안에는 요청 uri 를 적는다.
+                .contentType(MediaType.APPLICATION_JSON_UTF8) //요청 content type
+                .accept(MediaTypes.HAL_JSON) //응답 Media 타입
+                .content(objectMapper.writeValueAsString(event))) // HAL = Hypertext Application Language , 응답 내용을 ObjectMapper 로 작성한다.(JSON)
+                .andDo(print()) // 요청 정보를 모두 출력한다.
+                .andExpect(status().isBadRequest()); // 응답이 어떤지 확인한다. - andExpect()
     }
 }
