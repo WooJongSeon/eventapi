@@ -1,10 +1,10 @@
 package com.example.api.events;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.internal.Errors;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,18 +22,26 @@ public class EventController {
 
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
+    private final EventValidator eventValidator;
 
-    public EventController(EventRepository eventRepository , ModelMapper modelMapper){ // AutoWired 대신에 이렇게 작성 할 수도 있다.
+    public EventController(EventRepository eventRepository , ModelMapper modelMapper, EventValidator eventValidator){ // AutoWired 대신에 이렇게 작성 할 수도 있다.
         //컨트롤러의 생성자를 만들고 객체를 담는다.
         this.eventRepository = eventRepository;
         this.modelMapper = modelMapper;
+        this.eventValidator = eventValidator;
     }
 
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){// 모델매퍼를 활용해서 EventDTO 를 Event 로 바꾼다.
+        if (errors.hasErrors()) { // @Valid 애너테이션에 의해서 입력값이 걸러지면 여기에 걸린다.
+            return ResponseEntity.badRequest().build();
+        }
+
+        eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
+
 //        Event event = Event.builder() 1. ModelMapper 를 사용하지 않는 방법
 //                .name(eventDto.getName())
 //                .description(eventDto.getDescription())

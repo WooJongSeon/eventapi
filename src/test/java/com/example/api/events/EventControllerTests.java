@@ -110,4 +110,32 @@ public class EventControllerTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void createEvent_Bad_Request_Wrong_Input() throws Exception {
+        Event event = Event.builder()
+                .name("Spring")
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018,11,26,10,0))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018,11,25,10,0))
+                .beginEventDateTime(LocalDateTime.of(2018,11,24,10,0))
+                .endEventDateTime(LocalDateTime.of(2018,11,23,10,0))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("로케이션")
+                .free(true)
+                .offline(false)
+                .eventStatus(EventStatus.PUBLISHED)
+                .build();
+
+//        event.setId(10);
+//        Mockito.when(eventRepository.save(event)).thenReturn(event);
+        mockMvc.perform(post("/api/events/") //perform 안에는 요청 uri 를 적는다.
+                .contentType(MediaType.APPLICATION_JSON_UTF8) //요청 content type
+                .accept(MediaTypes.HAL_JSON) //응답 Media 타입
+                .content(objectMapper.writeValueAsString(event))) // HAL = Hypertext Application Language , 응답 내용을 ObjectMapper 로 작성한다.(JSON)
+                .andDo(print()) // 요청 정보를 모두 출력한다.
+                .andExpect(status().isBadRequest()); // 응답이 어떤지 확인한다. - andExpect()
+    }
 }
