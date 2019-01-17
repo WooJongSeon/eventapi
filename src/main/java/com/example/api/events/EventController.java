@@ -1,6 +1,7 @@
 package com.example.api.events;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.internal.Errors;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -28,7 +30,10 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody EventDto eventDto){ // 모델매퍼를 활용해서 EventDTO 를 Event 로 바꾼다.
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){// 모델매퍼를 활용해서 EventDTO 를 Event 로 바꾼다.
+        if (errors.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
 //        Event event = Event.builder() 1. ModelMapper 를 사용하지 않는 방법
 //                .name(eventDto.getName())
 //                .description(eventDto.getDescription())
