@@ -31,4 +31,18 @@ public class Event {
     private EventStatus eventStatus; // Enum 클래스 안의 데이터의 순서가 바뀌게 되면 데이터에 문제가 생긴다.
     //그래서 순서가 바뀌어도 문제 되지 않는 String 을 사용한다.
 
+    public void update(){
+        if (this.basePrice == 0 && this.maxPrice == 0) {
+            this.free = true;
+        }else{
+            this.free = false;
+        }
+        if (this.location == null || this.location.isBlank()) { // isBlank() java 11 에서 추가된 기능 , 공백문자열을 확인해서 비어있는지 체크한다.
+            this.offline = false;
+        }
+        else {
+            this.offline = true;
+        }
+    }
+
 }
