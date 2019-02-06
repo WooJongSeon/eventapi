@@ -2,6 +2,7 @@ package com.example.api.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -49,7 +50,16 @@ public class EventController {
         Event event = modelMapper.map(eventDto , Event.class); // 위에 사용하지 않는 방법은 많은 값을 입력한다. //ModelMapper 를 사용하면 이 1줄로 들어온 모든 값을 1세팅 할 수 있다.
         event.update();
         Event newEvent = this.eventRepository.save(event);
+
+        //ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+
         URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
+
+//        EventResource eventResource = new EventResource(event);
+//        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+//        eventResource.add(selfLinkBuilder.withSelfRel());
+//        eventResource.add(selfLinkBuilder.withRel("update-event"));
+
         return ResponseEntity.created(createUri).body(event);
     }
 

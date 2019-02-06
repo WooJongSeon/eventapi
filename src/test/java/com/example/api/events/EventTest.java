@@ -1,16 +1,31 @@
 package com.example.api.events;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(JUnitParamsRunner.class)
 public class EventTest {
+
+    @Test
+    @Parameters({
+            "1,2","12,2","1,20","14,2","15,2","1,25","12,2","11,2","11,2","1,62","14,2","1,22","1,42","13,2","31,2","1,52","51,2","1,62","61,2","1,2"
+    })
+    public void parameterTest(int num1, int num2){
+        System.out.println(num1 < num2);
+    }
+
 
     @Test
     public void builder(){
         Event event = Event.builder().build();
         assertThat(event).isNotNull();
     }
+
+
 
     @Test
     public void javaBean(){

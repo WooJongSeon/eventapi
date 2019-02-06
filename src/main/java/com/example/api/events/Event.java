@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 //롬복의 애너테이션들은 아직 줄일 수 있는 방법이 없다. 이렇게 다 작성해야 한다.
 @Entity
 public class Event {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String name;
     private String description;
