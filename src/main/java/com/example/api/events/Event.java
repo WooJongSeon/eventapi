@@ -28,7 +28,7 @@ public class Event {
     private boolean offline;
     private boolean free;
     @Enumerated(EnumType.STRING) // 기본 타입은 EnumType.Ordinal 인데 String 으로 바꿔주는 것이 좋다.
-    private EventStatus eventStatus; // Enum 클래스 안의 데이터의 순서가 바뀌게 되면 데이터에 문제가 생긴다.
+    private EventStatus eventStatus = EventStatus.DRAFT; // Enum 클래스 안의 데이터의 순서가 바뀌게 되면 데이터에 문제가 생긴다.
     //그래서 순서가 바뀌어도 문제 되지 않는 String 을 사용한다.
 
     public void update(){

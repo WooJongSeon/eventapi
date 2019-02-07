@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Builder @NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@Data
 public class EventDto {
     @NotEmpty
     private String name;
