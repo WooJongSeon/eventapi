@@ -54,9 +54,9 @@ public class EventController {
 
         URI createUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
 
-        EventResource eventResource = new EventResource(newEvent); // 링크를 추가하기 위한 코드
+        EventResource eventResource = new EventResource(newEvent); // 링크를 추가하기 위한 코드, 리팩토링 된다면 EventResource 부분으로 모두 몰아 넣는다.
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkBuilder.withSelfRel());
+//      eventResource.add(selfLinkBuilder.withSelfRel()); // 만든 event 객체 자신을 가리키는 링크를 추가한다.
         eventResource.add(selfLinkBuilder.withRel("update-event"));
 
 //        EventResource eventResource = new EventResource(event);
