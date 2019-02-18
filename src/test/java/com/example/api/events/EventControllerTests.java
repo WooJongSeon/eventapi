@@ -1,20 +1,30 @@
 package com.example.api.events;
 
+import com.example.api.common.RestDocsConfiguration;
 import com.example.api.common.TestDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //이렇게 SpringBootTest 애너테이션을 붙이면 메인 클래스의 @SpringBootApplication 애너테이션을 찾는다.
 //그렇게 찾은 후에는 모든 @Bean을 등록해준다. 그럼 테스트 코드에서 @Autowired 나 객체 사용시 문제가 없게 된다.
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
+@Import(RestDocsConfiguration.class)
 public class EventControllerTests {
 
     @Autowired
@@ -61,7 +73,29 @@ public class EventControllerTests {
                     .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andDo(document("create-event"));
+                .andDo(document("create-event",
+                    links(
+                            linkWithRel("self").description("link to self"),
+                            linkWithRel("query-events").description("link to query events"),
+                            linkWithRel("update-event").description("link to update an existing event")
+                    ),
+                        requestHeaders(headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin of new event"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of close of new event"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin of new event"),
+                                fieldWithPath("endEventDateTime").description("date time of end of new event"),
+                                fieldWithPath("location").description("location of new event"),
+                                fieldWithPath("basePrice").description("base price of new event"),
+                                fieldWithPath("maxPrice").description("max price of new event"),
+                                fieldWithPath("limitOfEnrollment").description("limit of new event")
+                        )
+                ));
+
 //                .andExpect(jsonPath("id").exists())
 //                .andExpect(header().exists(HttpHeaders.LOCATION))
 //                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaTypes.HAL_JSON_UTF8_VALUE))
