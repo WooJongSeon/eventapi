@@ -18,13 +18,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -54,6 +52,7 @@ public class EventControllerTests {
     @Test
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
     public void createEvent() throws Exception {
+
         EventDto event = EventDto.builder()
                 .name("Spring")
                 .description("REST API Development with Spring")
@@ -93,6 +92,29 @@ public class EventControllerTests {
                                 fieldWithPath("basePrice").description("base price of new event"),
                                 fieldWithPath("maxPrice").description("max price of new event"),
                                 fieldWithPath("limitOfEnrollment").description("limit of new event")
+                        ),
+                        responseHeaders(
+                            headerWithName(HttpHeaders.LOCATION).description("Location header"),
+                            headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("identifier of new event"),
+                                fieldWithPath("name").description("Name of new event"),
+                                fieldWithPath("description").description("description of new event"),
+                                fieldWithPath("beginEnrollmentDateTime").description("date time of begin enrollment"),
+                                fieldWithPath("closeEnrollmentDateTime").description("date time of close enrollment"),
+                                fieldWithPath("beginEventDateTime").description("date time of begin event time"),
+                                fieldWithPath("endEventDateTime").description("date time of end event time"),
+                                fieldWithPath("location").description("location"),
+                                fieldWithPath("basePrice").description("base price"),
+                                fieldWithPath("maxPrice").description("max price"),
+                                fieldWithPath("limitOfEnrollment").description("limit of enrollment"),
+                                fieldWithPath("free").description("free"),
+                                fieldWithPath("offline").description("it tells if this event offline"),
+                                fieldWithPath("eventStatus").description("event status"),
+                                fieldWithPath("_links.self.href").description("self link"),
+                                fieldWithPath("_links.query-events.href").description("query event link"),
+                                fieldWithPath("_links.update-event.href").description("update event link")
                         )
                 ));
 
